@@ -79,10 +79,10 @@ pipeline {
 
           echo "Fetching API URL from CloudFormation outputs..."
           API_URL=$(aws cloudformation describe-stacks \
-            --stack-name todo-list-aws-staging \
-            --region "$AWS_REGION" \
-            --query "Stacks[0].Outputs[?OutputKey=='$API_URL_OUTPUT_KEY'].OutputValue" \
-            --output text)
+                                --stack-name todo-list-aws-staging \
+                                --region us-east-1 \
+                                --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
+                                --output text)
 
           if [ -z "$API_URL" ] || [ "$API_URL" = "None" ]; then
             echo "ERROR: Could not read API URL from output key '$API_URL_OUTPUT_KEY'."
