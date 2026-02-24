@@ -76,7 +76,7 @@ pipeline {
 
           echo "Fetching API URL from CloudFormation outputs..."
           API_URL=$(aws cloudformation describe-stacks \
-            --stack-name "$STAGING_STACK" \
+            --stack-name todo-list-aws-staging \
             --region "$AWS_REGION" \
             --query "Stacks[0].Outputs[?OutputKey=='$API_URL_OUTPUT_KEY'].OutputValue" \
             --output text)
