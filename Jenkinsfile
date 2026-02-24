@@ -45,33 +45,28 @@ pipeline {
                 archiveArtifacts artifacts: 'reports/*', fingerprint: true
             }
         }
-
         stage('Deploy (SAM) - Staging') {
             steps {
                 sh '''
-          set -e
-          sam --version
-          aws --version
+      set -e
+      sam --version
+      aws --version
 
-          echo "Validate..."
-          sam validate --region "$AWS_REGION"
+      echo "Validate..."
+      sam validate --region "$AWS_REGION"
 
-          echo "Build..."
-          sam build
+      echo "Build..."
+      sam build
 
-          echo "Deploy (non-interactive) to staging..."
-          # Non-interactive: either samconfig.toml or explicit flags.
-          # Here we use explicit flags to avoid relying on samconfig.toml.
-          sam deploy \
-            --stack-name "$STAGING_STACK" \
-            --region "$AWS_REGION" \
-            --capabilities CAPABILITY_IAM \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset
-        '''
+      echo "Deploy using samconfig.toml (staging env)..."
+      sam deploy \
+        --config-env staging \
+        --region "$AWS_REGION" \
+        --no-confirm-changeset \
+        --no-fail-on-empty-changeset
+    '''
             }
         }
-
         stage('Rest Test') {
             steps {
                 sh '''
