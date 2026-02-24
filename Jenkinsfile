@@ -8,7 +8,7 @@ pipeline {
     environment {
         AWS_REGION = 'eu-west-1'
         AWS_DEFAULT_REGION = 'eu-west-1'
-        STAGING_STACK = 'todo-staging'
+        STAGING_STACK = 'staging'
         // Credenciales de github del entorno de Jenkins
         GIT_WRITE_CRED_ID = 'github-pat-write'
         // key de cloud formation para poder hacer pytest
