@@ -58,7 +58,10 @@ pipeline {
       sam build
 
       echo "Deploy using samconfig.toml (staging env)..."
-      sam deploy --config-env staging
+      sam deploy --config-env staging\
+      --no-confirm-changeset \
+      --no-fail-on-empty-changeset
+
     '''
             }
         }
