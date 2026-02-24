@@ -128,7 +128,7 @@ pipeline {
             # Ensure we merge the tested develop commit
             TESTED_COMMIT=$(git rev-parse HEAD)
 
-            git checkout master
+            git checkout origin/master
             git reset --hard origin/master
 
             # Merge develop into master (no fast-forward for traceability)
