@@ -58,11 +58,7 @@ pipeline {
       sam build
 
       echo "Deploy using samconfig.toml (staging env)..."
-      sam deploy \
-        --config-env staging \
-        --region "$AWS_REGION" \
-        --no-confirm-changeset \
-        --no-fail-on-empty-changeset
+      sam deploy \sam deploy --config-env staging
     '''
             }
         }
