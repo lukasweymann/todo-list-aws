@@ -65,7 +65,6 @@ pipeline {
           sam deploy \
             --stack-name "$STAGING_STACK" \
             --region "$AWS_REGION" \
-            --resolve-s3 \
             --capabilities CAPABILITY_IAM \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
