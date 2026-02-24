@@ -93,7 +93,7 @@ pipeline {
           echo "BASE_URL=$BASE_URL"
 
           # Make API URL available to pytest; adapt env var name to what tests expect
-          export TODO_API_BASE_URL="$BASE_URL"
+          export BASE_URL="$BASE_URL"
 
           echo "Running integration tests..."
           pytest -q test/integration/todoApiTest.py
