@@ -119,23 +119,38 @@ pipeline {
           passwordVariable: 'GH_TOKEN'
         )]) {
                     sh '''
-            set -e
-            git config user.email "ci-bot@example.com"
-            git config user.name "ci-bot"
+         set -e
 
-            git fetch origin
+git config user.email "ci-bot@example.com"
+git config user.name "ci-bot"
 
-            # Ensure we merge the tested develop commit
-            TESTED_COMMIT=$(git rev-parse HEAD)
+git fetch origin --prune
 
-            git checkout origin/master
-            git reset --hard origin/master
+# Commit that was tested on develop
+TESTED_COMMIT=$(git rev-parse HEAD)
 
-            # Merge develop into master (no fast-forward for traceability)
-            git merge --no-ff "$TESTED_COMMIT" -m "Promote: release from develop ($TESTED_COMMIT)"
+# Detect default branch on remote (usually main or master)
+DEFAULT_BRANCH=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD | sed 's@^origin/@@' || true)
 
-            # Push using token (do NOT echo tokenized URL)
-            git push "https://${GH_USER}:${GH_TOKEN}@github.com/lukasweymann/todo-list-aws.git" master
+if [ -z "$DEFAULT_BRANCH" ]; then
+  # Fallback if origin/HEAD isn't set
+  if git show-ref --verify --quiet refs/remotes/origin/main; then
+    DEFAULT_BRANCH=main
+  else
+    DEFAULT_BRANCH=master
+  fi
+fi
+
+echo "Default branch is: $DEFAULT_BRANCH"
+
+# Ensure local branch exists and tracks remote
+git checkout -B "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
+
+# Merge tested commit
+git merge --no-ff "$TESTED_COMMIT" -m "Promote: release from develop ($TESTED_COMMIT)"
+
+# Push using token (do NOT echo tokenized URL)
+git push "https://${GH_USER}:${GH_TOKEN}@github.com/lukasweymann/todo-list-aws.git" "$DEFAULT_BRANCH"
           '''
         }
             }
