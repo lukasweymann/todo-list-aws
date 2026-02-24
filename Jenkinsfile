@@ -11,7 +11,7 @@ pipeline {
         // Credenciales de github del entorno de Jenkins
         GIT_WRITE_CRED_ID = 'github-pat-write'
         // key de cloud formation para poder hacer pytest
-        API_URL_OUTPUT_KEY = 'ApiUrl'
+        BASE_URL_OUTPUT_KEY = 'ApiUrl'
     }
 
     stages {
@@ -78,19 +78,19 @@ pipeline {
           pip install pytest requests
 
           echo "Fetching API URL from CloudFormation outputs..."
-          API_URL=$(aws cloudformation describe-stacks \
+          BASE_URL=$(aws cloudformation describe-stacks \
                                 --stack-name todo-list-aws-staging \
                                 --region us-east-1 \
                                 --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
                                 --output text)
 
-          if [ -z "$API_URL" ] || [ "$API_URL" = "None" ]; then
-            echo "ERROR: Could not read API URL from output key '$API_URL_OUTPUT_KEY'."
-            echo "Check template Outputs or update API_URL_OUTPUT_KEY in Jenkinsfile."
+          if [ -z "$BASE_URL" ] || [ "$BASE_URL" = "None" ]; then
+            echo "ERROR: Could not read API URL from output key '$BASE_URL_OUTPUT_KEY'."
+            echo "Check template Outputs or update BASE_URL_OUTPUT_KEY in Jenkinsfile."
             exit 1
           fi
 
-          echo "API_URL=$API_URL"
+          echo "BASE_URL=$BASE_URL"
 
           # Make API URL available to pytest; adapt env var name to what tests expect
           export TODO_API_BASE_URL="$BASE_URL"
