@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'eu-west-1'
+        AWS_DEFAULT_REGION = 'eu-west-1'
         STAGING_STACK = 'todo-staging'
         // Credenciales de github del entorno de Jenkins
         GIT_WRITE_CRED_ID = 'github-pat-write'
@@ -53,7 +54,7 @@ pipeline {
           aws --version
 
           echo "Validate..."
-          sam validate
+          sam validate --region "$AWS_REGION"
 
           echo "Build..."
           sam build
