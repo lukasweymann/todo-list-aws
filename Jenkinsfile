@@ -1,0 +1,84 @@
+pipeline {
+    agent any
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        // Production identifiers
+        PROD_STACK = 'todo-list-aws-production'
+
+        BASE_URL_OUTPUT_KEY = 'BaseUrlApi'
+        AWS_REGION = 'us-east-1'
+    }
+
+    stages {
+        stage('Get Code') {
+            steps {
+                checkout scm
+                sh '''
+                  set -e
+                  echo "Branch: $BRANCH_NAME"
+                  git rev-parse --short HEAD
+                  test -d src
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                  set -e
+                  sam --version
+                  aws --version
+
+                  echo "Validando..."
+                  sam validate
+
+                  echo "Construyendo..."
+                  sam build
+
+                  echo "Desplegando a production (samconfig.toml)..."
+                  sam deploy \
+                    --config-env production \
+                    --resolve-s3 \
+                    --no-confirm-changeset \
+                    --no-fail-on-empty-changeset
+                '''
+            }
+        }
+
+        stage('Rest Test (Read-only)') {
+            steps {
+                sh '''
+                  set -e
+
+                  python3 -m venv .venv
+                  . .venv/bin/activate
+                  pip install -U pip
+                  pip install pytest requests
+
+                  echo "Extracción de la URL (producción) desde CloudFormation..."
+                  BASE_URL=$(aws cloudformation describe-stacks \
+                    --stack-name "$PROD_STACK" \
+                    --region "$AWS_REGION" \
+                    --query "Stacks[0].Outputs[?OutputKey=='$BASE_URL_OUTPUT_KEY'].OutputValue" \
+                    --output text)
+
+                  if [ -z "$BASE_URL" ] || [ "$BASE_URL" = "None" ]; then
+                    echo "ERROR: no se ha podido leer la url desde OutputKey='$BASE_URL_OUTPUT_KEY'."
+                    exit 1
+                  fi
+
+                  echo "BASE_URL=$BASE_URL"
+                  export BASE_URL="$BASE_URL"
+
+                  echo "Tests de integración (solo lectura) con pytest..."
+                  echo "Ejecutando: pytest -vv -m read test/integration/todoApiTest.py"
+                  pytest -vv -m read test/integration/todoApiTest.py
+                '''
+            }
+        }
+    }
+}
