@@ -136,7 +136,7 @@ pipeline {
             git merge --no-ff "$TESTED_COMMIT" -m "Promote: release from develop ($TESTED_COMMIT)"
 
             # Subir cambios sin exponer datos sensibles en echo
-            git push "https://${GH_USER}:${GH_TOKEN}@github.com/lukasweymann /todo-list-aws.git" master
+            git push "https://${GH_USER}:${GH_TOKEN}@github.com/lukasweymann/todo-list-aws.git" master
           '''
         }
             }
@@ -305,7 +305,7 @@ pipeline {
 //                       git merge --no-ff "$TESTED_COMMIT" -m "Promote: release from develop ($TESTED_COMMIT)"
 
 //                       # Push using token (do NOT echo token)
-//                       git push "https://${GH_USER}:${GH_TOKEN}@github.com/lukasweymann /todo-list-aws.git" master
+//                       git push "https://${GH_USER}:${GH_TOKEN}@github.com/lukasweymann/todo-list-aws.git" master
 //                     '''
 //                 }
 //             }
