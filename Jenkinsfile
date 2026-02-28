@@ -58,7 +58,7 @@ pipeline {
       sam build
 
       echo "Deploy using samconfig.toml (staging env)..."
-      sam deploy --config-env staging\
+      sam deploy --config-env staging  --resolve-s3\
       --no-confirm-changeset \
       --no-fail-on-empty-changeset
 
@@ -123,7 +123,7 @@ pipeline {
             git config user.email "ci-bot@example.com"
             git config user.name "ci-bot"
 
-            git fetch origin
+            git fetch origin --prune '+refs/heads/*:refs/remotes/origin/*'
 
             # Ensure we merge the tested develop commit
             TESTED_COMMIT=$(git rev-parse HEAD)
