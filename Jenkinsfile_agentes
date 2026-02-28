@@ -76,7 +76,22 @@ pipeline {
       --no-confirm-changeset \
       --no-fail-on-empty-changeset
 
+      mkdir -p env
+      BASE_URL=$(aws cloudformation describe-stacks \
+        --stack-name todo-list-aws-staging \
+        --region us-east-1 \
+        --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
+        --output text)
+
+      if [ -z "$BASE_URL" ] || [ "$BASE_URL" = "None" ]; then
+        echo "ERROR: could not read BASE_URL from CloudFormation."
+        exit 1
+      fi
+
+      echo "$BASE_URL" > env/BASE_URL.txt
+      echo "Saved BASE_URL: $BASE_URL"
     '''
+                stash name: 'envdata', includes: 'env/BASE_URL.txt'
             }
         }
 
@@ -89,19 +104,9 @@ pipeline {
           whoami
           hostname
 
-          echo "Extracción de la URL de cloudformation..."
-          BASE_URL=$(aws cloudformation describe-stacks \
-                                --stack-name todo-list-aws-staging \
-                                --region us-east-1 \
-                                --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
-                                --output text)
-
-          if [ -z "$BASE_URL" ] || [ "$BASE_URL" = "None" ]; then
-            echo "ERROR: no se ha podido leer la url desde '$BASE_URL_OUTPUT_KEY'."
-            exit 1
-          fi
-
-          echo "BASE_URL=$BASE_URL"
+          BASE_URL=$(cat env/BASE_URL.txt)
+      export BASE_URL="$BASE_URL"
+      echo "BASE_URL=$BASE_URL"
 
           # Haciendo la URL accesible para pytest
           export BASE_URL="$BASE_URL"
