@@ -6,8 +6,7 @@ pipeline {
     }
 
     environment {
-        AWS_REGION = 'eu-west-1'
-        AWS_DEFAULT_REGION = 'eu-west-1'
+        AWS_REGION = 'us-east-1'
         // Credenciales de github del entorno de Jenkins
         GIT_WRITE_CRED_ID = 'github-pat-write'
         // key de cloud formation para poder hacer pytest
@@ -57,7 +56,7 @@ pipeline {
       echo "Validando..."
       sam validate --region "$AWS_REGION"
 
-      echo "Construyendo..."
+      echo "Construyendo con sam..."
       sam build
 
       echo "Deploy using samconfig.toml (staging env)..."
@@ -96,8 +95,8 @@ pipeline {
           # Haciendo la URL accesible para pytest
           export BASE_URL="$BASE_URL"
 
-          echo "Tests de integración..."
-          pytest -q test/integration/todoApiTest.py
+        echo "Ejecutando tests de integración...: pytest -vv test/integration/todoApiTest.py"
+            pytest -vv test/integration/todoApiTest.py
         '''
             }
         }
@@ -152,8 +151,6 @@ pipeline {
 
 //     environment {
 //         // Single, consistent region everywhere
-//         AWS_REGION = 'eu-west-1'
-//         AWS_DEFAULT_REGION = 'eu-west-1'
 
 //         // GitHub write credential for promote (develop -> master)
 //         GIT_WRITE_CRED_ID = 'github-pat-write'
