@@ -8,7 +8,6 @@ pipeline {
     environment {
         // Production identifiers
         PROD_STACK = 'todo-list-aws-production'
-
         BASE_URL_OUTPUT_KEY = 'BaseUrlApi'
         AWS_REGION = 'us-east-1'
     }
@@ -17,6 +16,12 @@ pipeline {
         stage('Get Code') {
             agent any
             steps {
+                sh '''
+                  set -e
+                  echo "=== NODE INFO (Get Code) ==="
+                  whoami
+                  hostname
+                '''
                 checkout scm
                 sh '''
                   set -e
@@ -32,6 +37,10 @@ pipeline {
             steps {
                 sh '''
                   set -e
+                  echo "=== NODE INFO (Deploy) ==="
+                  whoami
+                  hostname
+
                   sam --version
                   aws --version
 
@@ -56,6 +65,9 @@ pipeline {
             steps {
                 sh '''
                   set -e
+                  echo "=== NODE INFO (Rest Test - Read-only) ==="
+                  whoami
+                  hostname
 
                   python3 -m venv .venv
                   . .venv/bin/activate
