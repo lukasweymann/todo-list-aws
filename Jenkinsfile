@@ -9,6 +9,8 @@ pipeline {
         AWS_REGION = 'us-east-1'
         // Credenciales de github del entorno de Jenkins
         GIT_WRITE_CRED_ID = 'github-pat-write'
+        // key de cloud formation para poder hacer pytest
+        BASE_URL_OUTPUT_KEY = 'ApiUrl'
     }
 
     stages {
@@ -76,7 +78,7 @@ pipeline {
           pip install -U pip
           pip install pytest requests
 
-          echo "Extracción de la URL de CloudFormation..."
+          echo "Extracción de la URL de cloudformation..."
           BASE_URL=$(aws cloudformation describe-stacks \
                                 --stack-name todo-list-aws-staging \
                                 --region us-east-1 \
@@ -84,7 +86,7 @@ pipeline {
                                 --output text)
 
           if [ -z "$BASE_URL" ] || [ "$BASE_URL" = "None" ]; then
-            echo "ERROR: no se ha podido leer la url de CloudFormation."
+            echo "ERROR: no se ha podido leer la url desde '$BASE_URL_OUTPUT_KEY'."
             exit 1
           fi
 
