@@ -40,13 +40,6 @@ pipeline {
           hostname
 
           set +e
-          python3 -m venv .venv
-          . .venv/bin/activate
-
-          # Pipeline determinístico, puede que estén las dependencias en la máquina pero optamos por reproducibilidad en cualquier máquina/agente
-
-          pip install -U pip
-          pip install flake8 bandit
 
           mkdir -p reports
 
@@ -95,13 +88,6 @@ pipeline {
           echo "=== NODE INFO (Rest Test) ==="
           whoami
           hostname
-
-          . .venv/bin/activate || true
-
-          python3 -m venv .venv
-          . .venv/bin/activate
-          pip install -U pip
-          pip install pytest requests
 
           echo "Extracción de la URL de cloudformation..."
           BASE_URL=$(aws cloudformation describe-stacks \
