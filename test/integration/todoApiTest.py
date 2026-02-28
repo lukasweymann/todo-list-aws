@@ -12,7 +12,7 @@ BASE_URL = os.environ.get("BASE_URL")
 DEFAULT_TIMEOUT = 2  # in secs
 
 
-@pytest.mark.api
+@pytest.mark.read
 class TestApi(unittest.TestCase):
     
     def setUp(self):
