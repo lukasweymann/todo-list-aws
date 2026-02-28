@@ -6,8 +6,6 @@ pipeline {
     }
 
     environment {
-        AWS_REGION = 'eu-west-1'
-        AWS_DEFAULT_REGION = 'eu-west-1'
         // Credenciales de github del entorno de Jenkins
         GIT_WRITE_CRED_ID = 'github-pat-write'
         // key de cloud formation para poder hacer pytest
@@ -55,7 +53,7 @@ pipeline {
       aws --version
 
       echo "Validando..."
-      sam validate --region "$AWS_REGION"
+      sam validate
 
       echo "Construyendo..."
       sam build
@@ -152,8 +150,6 @@ pipeline {
 
 //     environment {
 //         // Single, consistent region everywhere
-//         AWS_REGION = 'eu-west-1'
-//         AWS_DEFAULT_REGION = 'eu-west-1'
 
 //         // GitHub write credential for promote (develop -> master)
 //         GIT_WRITE_CRED_ID = 'github-pat-write'
