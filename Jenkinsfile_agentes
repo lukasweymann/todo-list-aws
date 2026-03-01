@@ -25,6 +25,11 @@ pipeline {
                 checkout scm
                 sh '''
                   set -e
+                  echo "Descargando samconfig.toml desde repo de config (branch: staging)..."
+                  curl -fsSL -o samconfig.toml \
+                  https://raw.githubusercontent.com/lukasweymann/todo-list-aws-config/staging/samconfig.toml
+                  echo "samconfig.toml descargado:"
+                  head -n 30 samconfig.toml
                   echo "Branch: $BRANCH_NAME"
                   git rev-parse --short HEAD
                   test -d src
