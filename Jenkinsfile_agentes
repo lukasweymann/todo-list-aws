@@ -74,7 +74,7 @@ pipeline {
       aws --version
 
       echo "Validando..."
-      sam validate --region "$AWS_REGION"
+      sam validate
 
       echo "Construyendo con sam..."
       sam build
