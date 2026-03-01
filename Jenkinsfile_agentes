@@ -56,38 +56,45 @@ pipeline {
                     --resolve-s3 \
                     --no-confirm-changeset \
                     --no-fail-on-empty-changeset
+
+                       mkdir -p env
+
+                  BASE_URL=$(aws cloudformation describe-stacks \
+                  --stack-name todo-list-aws-staging \
+                  --region us-east-1 \
+                  --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
+                  --output text)
+
+                  if [ -z "$BASE_URL" ] || [ "$BASE_URL" = "None" ]; then
+                  echo "ERROR: could not read BASE_URL"
+                  exit 1
+                  fi
+
+                  echo "$BASE_URL" > env/BASE_URL.txt
+                  echo "Saved BASE_URL=$BASE_URL"
+                  ls -R .
                 '''
+                stash name: 'envdata', includes: 'env/**'
             }
         }
 
         stage('Rest Test (Read-only)') {
             agent { label 'rest-agent' }
             steps {
+                unstash 'envdata'
+
                 sh '''
                   set -e
                   echo "=== NODE INFO (Rest Test - Read-only) ==="
                   whoami
                   hostname
 
-                  python3 -m venv .venv
-                  . .venv/bin/activate
-                  pip install -U pip
-                  pip install pytest requests
+                  echo "Workspace content:"
+                  ls -R .
 
-                  echo "Extracción de la URL (producción) desde CloudFormation..."
-                  BASE_URL=$(aws cloudformation describe-stacks \
-                    --stack-name "$PROD_STACK" \
-                    --region "$AWS_REGION" \
-                    --query "Stacks[0].Outputs[?OutputKey=='$BASE_URL_OUTPUT_KEY'].OutputValue" \
-                    --output text)
-
-                  if [ -z "$BASE_URL" ] || [ "$BASE_URL" = "None" ]; then
-                    echo "ERROR: no se ha podido leer la url desde OutputKey='$BASE_URL_OUTPUT_KEY'."
-                    exit 1
-                  fi
-
-                  echo "BASE_URL=$BASE_URL"
+                  BASE_URL=$(cat env/BASE_URL.txt)
                   export BASE_URL="$BASE_URL"
+                  echo "BASE_URL=$BASE_URL"
 
                   echo "Tests de integración (solo lectura) con pytest..."
                   echo "Ejecutando: pytest -vv -m read test/integration/todoApiTest.py"
