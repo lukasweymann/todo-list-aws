@@ -98,6 +98,7 @@ pipeline {
         stage('Rest Test') {
             agent { label 'rest-agent' }
             steps {
+                unstash 'envdata'
                 sh '''
           set -e
           echo "=== NODE INFO (Rest Test) ==="
